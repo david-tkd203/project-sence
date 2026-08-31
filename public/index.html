@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Proyecto Backend - Módulo #6</title>
+  <link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+  <div class="container">
+    <header class="header">
+      <div class="badge">Node.js & Express</div>
+      <h1>Evaluación Módulo #6: Primeros Pasos con Node y Express</h1>
+      <p class="subtitle">Estructura base, rutas modulares, contenido estático y persistencia plana en archivo.</p>
+    </header>
+
+    <main class="card">
+      <h2>🚀 Servidor Iniciado y Operativo</h2>
+      <p>Esta página HTML estática es servida directamente desde la carpeta pública mediante el middleware <code>express.static('public')</code>.</p>
+      
+      <div class="endpoints-box">
+        <h3>Rutas Disponibles:</h3>
+        <ul>
+          <li>
+            <strong>GET <code>/</code></strong>: Vista de inicio HTML (Página actual).
+          </li>
+          <li>
+            <strong>GET <code>/status</code></strong>: Endpoint público que retorna el estado del servidor en formato <strong>JSON</strong>.
+            <br>
+            <a href="/status" target="_blank" class="btn">Probar /status (JSON)</a>
+          </li>
+        </ul>
+      </div>
+
+      <div class="features-grid">
+        <div class="feature-item">
+          <h4>📁 Arquitectura Modular</h4>
+          <p>Estructurado en 5 carpetas: <code>routes/</code>, <code>controllers/</code>, <code>middlewares/</code>, <code>public/</code> y <code>logs/</code>.</p>
+        </div>
+        <div class="feature-item">
+          <h4>📝 Persistencia Plana</h4>
+          <p>Cada visita a las rutas se registra automáticamente en <code>logs/log.txt</code> usando <code>fs.appendFile</code>.</p>
+        </div>
+        <div class="feature-item">
+          <h4>⚙️ Variables de Entorno</h4>
+          <p>Configuración dinámica del puerto mediante <code>dotenv</code> y <code>.env</code>.</p>
+        </div>
+      </div>
+    </main>
+
+    <footer class="footer">
+      <p>Desarrollado para la Evaluación de Backend (Módulo #6, #7 y #8) - Alkemy / Sence</p>
+    </footer>
+  </div>
+</body>
+</html>

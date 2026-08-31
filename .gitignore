@@ -1,0 +1,9 @@
+# Dependencias instaladas por npm
+node_modules/
+
+# Archivos de entorno que contienen secretos o configuraciones locales
+.env
+
+# Archivos de registro del sistema operativo
+.DS_Store
+Thumbs.db

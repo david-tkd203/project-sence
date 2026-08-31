@@ -1,0 +1,4 @@
+[2026-08-30 21:30:00] Método: GET | Ruta: /
+[2026-08-30 21:30:15] Método: GET | Ruta: /status
+[2026-08-30 21:30:45] Método: GET | Ruta: /
+[2026-08-31 21:39:33] Método: GET | Ruta: /status
