@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Portafolio Profesional - David | Talento Junior Tech</title>
+  <link rel="stylesheet" href="/styles.css">
+  <style>
+    .portfolio-nav {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 2rem;
+      border-bottom: 1px solid var(--border-color);
+      padding-bottom: 1rem;
+    }
+    .portfolio-nav a {
+      color: var(--primary-color);
+      text-decoration: none;
+      font-weight: 500;
+    }
+    .project-card {
+      background: rgba(15, 23, 42, 0.6);
+      border: 1px solid var(--border-color);
+      border-radius: 10px;
+      padding: 1.5rem;
+      margin-bottom: 1.5rem;
+      transition: transform 0.2s ease;
+    }
+    .project-card:hover {
+      transform: translateY(-2px);
+      border-color: var(--primary-color);
+    }
+    .project-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 0.75rem;
+    }
+    .tag {
+      display: inline-block;
+      background: rgba(59, 130, 246, 0.15);
+      color: #60a5fa;
+      padding: 0.2rem 0.6rem;
+      border-radius: 9999px;
+      font-size: 0.75rem;
+      margin-right: 0.4rem;
+      margin-bottom: 0.4rem;
+    }
+    .case-study-box {
+      background: linear-gradient(145deg, rgba(30, 41, 59, 0.8), rgba(15, 23, 42, 0.9));
+      border: 2px solid var(--primary-color);
+      border-radius: 12px;
+      padding: 2rem;
+      margin-top: 2rem;
+      margin-bottom: 2rem;
+    }
+    .metric-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 1rem;
+      margin: 1.5rem 0;
+    }
+    .metric-card {
+      background: rgba(0, 0, 0, 0.3);
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      padding: 1rem;
+      text-align: center;
+    }
+    .metric-val {
+      font-size: 1.6rem;
+      font-weight: 700;
+      color: var(--success-color);
+      margin-bottom: 0.25rem;
+    }
+    .metric-label {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+    }
+    .foda-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 1rem;
+    }
+    .foda-table th, .foda-table td {
+      border: 1px solid var(--border-color);
+      padding: 0.75rem 1rem;
+      text-align: left;
+      font-size: 0.85rem;
+    }
+    .foda-table th {
+      background: rgba(59, 130, 246, 0.15);
+      color: #93c5fd;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <nav class="portfolio-nav">
+      <div>
+        <a href="/" class="btn btn-secondary">← Volver al Panel de la API</a>
+      </div>
+      <div>
+        <a href="https://github.com/david-tkd203/project-sence" target="_blank" class="btn btn-primary">Ver Repositorio GitHub ↗</a>
+      </div>
+    </nav>
+
+    <header class="header">
+      <div class="badge">Portafolio Técnico Profesional</div>
+      <h1>David — Talento Junior Tech</h1>
+      <p class="subtitle">Desarrollo Backend en Node.js • Express • Sequelize ORM • APIs RESTful • Seguridad JWT</p>
+    </header>
+
+    <!-- Sección: Proyectos del Portafolio -->
+    <main class="card">
+      <h2>🚀 Proyectos Destacados</h2>
+      <p>Selección de soluciones técnicas construidas aplicando arquitecturas limpias, persistencia y seguridad:</p>
+
+      <!-- Proyecto 1 -->
+      <div class="project-card">
+        <div class="project-header">
+          <div>
+            <h3>1. Sistema Backend Integrador (Módulos #6, #7 y #8)</h3>
+            <div style="margin-top: 0.5rem;">
+              <span class="tag">Node.js</span>
+              <span class="tag">Express</span>
+              <span class="tag">Sequelize ORM</span>
+              <span class="tag">JWT</span>
+              <span class="tag">Multer</span>
+              <span class="tag">SQLite/PostgreSQL</span>
+            </div>
+          </div>
+          <a href="https://github.com/david-tkd203/project-sence" target="_blank" class="btn btn-primary" style="font-size: 0.75rem;">Código ↗</a>
+        </div>
+        <p>API RESTful integral estructurada en capas (rutas, controladores, servicios y modelos). Incorpora autenticación Bearer con tokens JWT, protección contra inyección SQL, operaciones CRUD completas y almacenamiento de archivos multipart.</p>
+      </div>
+
+      <!-- Proyecto 2 -->
+      <div class="project-card">
+        <div class="project-header">
+          <div>
+            <h3>2. Módulo de Transaccionalidad Atómica y Auditoría</h3>
+            <div style="margin-top: 0.5rem;">
+              <span class="tag">ACID Transactions</span>
+              <span class="tag">Sequelize</span>
+              <span class="tag">fs Module</span>
+              <span class="tag">Auditoría</span>
+            </div>
+          </div>
+          <a href="https://github.com/david-tkd203/project-sence/blob/main/services/user.service.js" target="_blank" class="btn btn-secondary" style="font-size: 0.75rem;">Ver Servicio ↗</a>
+        </div>
+        <p>Implementación de transacciones atómicas dependientes (creación de usuario + pedido de bienvenida). Cuenta con rollback garantizado ante cualquier falla en la cadena de persistencia y registro automático de anomalías en logs/log.txt.</p>
+      </div>
+
+      <!-- Proyecto 3 -->
+      <div class="project-card">
+        <div class="project-header">
+          <div>
+            <h3>3. Consola Interactiva de Diagnóstico y Pruebas de API</h3>
+            <div style="margin-top: 0.5rem;">
+              <span class="tag">HTML5</span>
+              <span class="tag">CSS3 Moderno</span>
+              <span class="tag">Fetch API</span>
+              <span class="tag">Async/Await</span>
+            </div>
+          </div>
+          <a href="/" class="btn btn-secondary" style="font-size: 0.75rem;">Probar en Vivo ↗</a>
+        </div>
+        <p>Interfaz web integrada para desarrolladores que permite testear login, generación de tokens JWT, consumo autenticado de endpoints protegidos, subida de avatares con Multer y consultas de relaciones 1:N en tiempo real.</p>
+      </div>
+
+      <!-- Caso de Estudio Detallado -->
+      <div class="case-study-box">
+        <div class="badge" style="background: rgba(16, 185, 129, 0.2); color: #34d399; border-color: rgba(16, 185, 129, 0.4);">
+          ⭐ Caso de Estudio Técnico Principal
+        </div>
+        <h2>Diseño de un Backend Seguro con Transaccionalidad y JWT</h2>
+        
+        <p><strong>Desafío Principal:</strong> Evitar la inconsistencia de datos y estados huérfanos en operaciones complejas de base de datos, resguardando simultáneamente los datos confidenciales mediante autenticación sin estado (stateless).</p>
+        
+        <p><strong>Solución Implementada:</strong> Arquitectura desacoplada en capas (routes → controllers → services → models). Integración de <code>sequelize.transaction()</code> para garantizar atomicidad ACID, middleware centralizado de autenticación Bearer con <code>jsonwebtoken</code> y hashing de contraseñas con <code>bcryptjs</code>.</p>
+
+        <!-- Métricas de Impacto -->
+        <div class="metric-grid">
+          <div class="metric-card">
+            <div class="metric-val">100%</div>
+            <div class="metric-label">Consistencia de datos (Rollback verificado)</div>
+          </div>
+          <div class="metric-card">
+            <div class="metric-val">0%</div>
+            <div class="metric-label">Exposición de hashes confidenciales</div>
+          </div>
+          <div class="metric-card">
+            <div class="metric-val">&lt; 3ms</div>
+            <div class="metric-label">Tiempo de respuesta en consultas ORM</div>
+          </div>
+          <div class="metric-card">
+            <div class="metric-val">100%</div>
+            <div class="metric-label">Rutas de mutación protegidas con JWT</div>
+          </div>
+        </div>
+
+        <p><strong>Aprendizajes Clave:</strong> Aplicación práctica de transacciones de base de datos para entornos empresariales, diseño de seguridad mediante tokens criptográficos y validación defensiva de entradas de usuario.</p>
+      </div>
+
+      <!-- Resumen FODA -->
+      <section class="section-box">
+        <h3>📊 Análisis Estratégico Personal (Matriz FODA)</h3>
+        <p class="section-desc">Diagnóstico de posicionamiento para inserción en el mercado laboral tecnológico:</p>
+        <table class="foda-table">
+          <thead>
+            <tr>
+              <th>Fortalezas (Interno)</th>
+              <th>Áreas de Oportunidad / Debilidades (Interno)</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>• Bases sólidas en arquitecturas modulares backend.<br>• Transaccionalidad (ACID) y persistencia relacional con ORM.<br>• Seguridad con JWT, bcryptjs y validación de entradas.<br>• Capacidad de aprendizaje acelerado y adaptabilidad.<br>• Rigurosidad en control de versiones con conventional commits.</td>
+              <td>• Profundizar en despliegues cloud a gran escala (AWS/GCP).<br>• Automatización avanzada de pruebas con frameworks de testing (Jest).<br>• Exploración de colas de mensajería (RabbitMQ/Kafka).<br>• Optimización fina de consultas complejas de base de datos.<br>• Inglés conversacional técnico para equipos globales.</td>
+            </tr>
+          </tbody>
+          <thead>
+            <tr>
+              <th>Oportunidades (Externo)</th>
+              <th>Amenazas (Externo)</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>• Alta demanda de juniors con competencias reales de backend y BD.<br>• Crecimiento del sector Fintech y E-commerce en LATAM (Mercado Libre).<br>• Apertura de posiciones remotas e híbridas regionales.<br>• Programas y academias corporativas de atracción de talento.<br>• Uso de herramientas modernas para acelerar productividad.</td>
+              <td>• Competitividad en el segmento junior.<br>• Exigencia de conocimientos fullstack en convocatorias iniciales.<br>• Rápido ritmo de evolución de herramientas tecnológicas.<br>• Variaciones y ajustes de contratación en el sector tecnológico.<br>• Aumento de estándares de calidad desde etapas tempranas.</td>
+            </tr>
+          </tbody>
+        </table>
+      </section>
+
+      <!-- Contacto -->
+      <div style="text-align: center; margin-top: 2rem;">
+        <h3>¿Hablamos sobre una oportunidad laboral?</h3>
+        <p style="color: var(--text-muted); margin-bottom: 1rem;">Disponible para posiciones como <strong>Talento Junior Tech</strong> (Remoto / Híbrido).</p>
+        <a href="https://github.com/david-tkd203" target="_blank" class="btn btn-primary">Visitar GitHub de David</a>
+      </div>
+    </main>
+
+    <footer class="footer">
+      <p>Portafolio desarrollado para el programa ABP - Alkemy / Sence | 2026</p>
+    </footer>
+  </div>
+</body>
+</html>

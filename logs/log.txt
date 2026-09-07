@@ -17,3 +17,4 @@
 [2026-09-07 22:25:10] Método: POST | Ruta: /usuarios
 [2026-09-07 22:25:10] Método: POST | Ruta: /usuarios
 [2026-09-07 22:25:10] Método: POST | Ruta: /upload
+[2026-09-07 23:48:21] Método: GET | Ruta: /portfolio
