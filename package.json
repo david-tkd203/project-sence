@@ -1,7 +1,7 @@
 {
-  "name": "proyecto-node-express-modulo6",
-  "version": "1.0.0",
-  "description": "Proyecto Backend con Node.js y Express para la evaluación del Módulo #6",
+  "name": "proyecto-node-express-modulo7",
+  "version": "2.0.0",
+  "description": "Proyecto Backend con Node.js, Express y ORM Sequelize para la evaluación de los Módulos #6 y #7",
   "main": "index.js",
   "scripts": {
     "start": "node index.js",
@@ -10,8 +10,11 @@
   "keywords": [
     "nodejs",
     "express",
+    "sequelize",
+    "sqlite",
     "backend",
-    "junior",
+    "crud",
+    "transactions",
     "sence",
     "alkemy"
   ],
@@ -19,7 +22,9 @@
   "license": "ISC",
   "dependencies": {
     "dotenv": "^16.4.5",
-    "express": "^4.19.2"
+    "express": "^4.19.2",
+    "sequelize": "^6.37.8",
+    "sqlite3": "^6.0.1"
   },
   "devDependencies": {
     "nodemon": "^3.1.4"

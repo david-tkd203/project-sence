@@ -1,8 +1,8 @@
-# Proyecto Node & Express Web App - Evaluación Módulo #6
+# Proyecto Node & Express Web App - Evaluación Módulos #6 y #7
 
-Aplicación backend desarrollada con **Node.js** y **Express** correspondiente a la primera entrega del Trabajo Práctico Integrador (Módulo #6: *Primeros pasos con Node y Express*).
+Aplicación backend desarrollada con **Node.js**, **Express** y el ORM **Sequelize**, correspondiente a las entregas de los **Módulos #6** (*Primeros pasos con Node y Express*) y **#7** (*Acceso a datos en aplicaciones Node*) del programa de formación (Alkemy / Sence).
 
-Este proyecto sienta las bases arquitectónicas modulares para el posterior escalado e integración de bases de datos relacionales/documentales (Módulo #7) y seguridad con JWT y subida de archivos (Módulo #8).
+El proyecto implementa una arquitectura modular profesional con persistencia relacional en base de datos, operaciones CRUD completas, transaccionalidad atómica con rollback, relaciones 1:N entre entidades y registro de auditoría.
 
 ---
 
@@ -12,149 +12,182 @@ Este proyecto sienta las bases arquitectónicas modulares para el posterior esca
 2. [Estructura del Proyecto](#-estructura-del-proyecto)
 3. [Instalación y Configuración](#-instalación-y-configuración)
 4. [Ejecución del Servidor](#-ejecución-del-servidor)
-5. [Endpoints y Rutas Disponibles](#-endpoints-y-rutas-disponibles)
-6. [Justificaciones Técnicas de Diseño](#-justificaciones-técnicas-de-diseño)
-7. [Reflexión y Proyección a Futuro (Módulos #7 y #8)](#-reflexión-y-proyección-a-futuro-módulos-7-y-8)
+5. [Endpoints y Rutas de la API](#-endpoints-y-rutas-de-la-api)
+6. [Respuestas a Justificaciones Técnicas (Módulo #7)](#-respuestas-a-justificaciones-técnicas-módulo-7)
+   - [Lección 1: Conexión y Protección de Datos Sensibles](#lección-1-conexión-y-protección-de-datos-sensibles)
+   - [Lección 2: Obtención de Datos y Filtrado](#lección-2-obtención-de-datos-y-filtrado)
+   - [Lección 3: Modificación Controlada y Validaciones](#lección-3-modificación-controlada-y-validaciones)
+   - [Lección 4: Transaccionalidad y Rollback](#lección-4-transaccionalidad-y-rollback)
+   - [Lección 5: Comparación ORM vs SQL Tradicional](#lección-5-comparación-orm-vs-sql-tradicional)
+   - [Lección 6: Relaciones 1:N en el ORM](#lección-6-relaciones-1n-en-el-orm)
+7. [Proyección al Módulo #8 (Seguridad, JWT y Subida de Archivos)](#-proyección-al-módulo-8)
 
 ---
 
 ## 💻 Requisitos del Sistema
 
-- **Node.js**: Versión 18.x o superior instalada ([nodejs.org](https://nodejs.org/)).
-- **npm**: Gestor de paquetes incluido con Node.js (v9.x o superior).
-- Sistema Operativo: Windows, macOS o Linux.
+- **Node.js**: Versión 18.x o superior ([nodejs.org](https://nodejs.org/)).
+- **npm**: Versión 9.x o superior.
+- Sistema Operativo: Windows, Linux o macOS.
 
 ---
 
 ## 📁 Estructura del Proyecto
 
-El proyecto implementa una arquitectura modular con separación de responsabilidades en 5 carpetas principales:
+El proyecto sigue una arquitectura modular en capas con estricta separación de responsabilidades:
 
 ```text
 proyecto-curso-sence/
-├── controllers/              # Lógica de negocio y manejadores de respuestas
-│   └── general.controller.js # Controladores para rutas públicas (HTML y JSON)
-├── logs/                     # Persistencia de datos en archivos planos
-│   └── log.txt               # Registro histórico de accesos a la aplicación
-├── middlewares/              # Funciones intermedias del ciclo solicitud-respuesta
-│   └── logger.middleware.js  # Middleware de logging asíncrono con fs.appendFile
-├── public/                   # Archivos estáticos servidos públicamente
-│   ├── index.html            # Vista HTML principal
-│   └── styles.css            # Hoja de estilos CSS
-├── routes/                   # Definición y mapeo de endpoints con Router
-│   └── general.routes.js     # Enrutador para las rutas / y /status
+├── config/                   # Configuración del servidor y base de datos
+│   └── database.js           # Conexión Sequelize con soporte multi-dialecto (.env)
+├── controllers/              # Controladores que reciben peticiones y dan formato a respuestas
+│   ├── general.controller.js # Controladores de rutas públicas (/, /status)
+│   └── user.controller.js    # Controladores CRUD, filtros, relaciones y transacciones
+├── logs/                     # Persistencia plana y logs de auditoría
+│   └── log.txt               # Registro histórico de accesos y transacciones fallidas
+├── middlewares/              # Middlewares interceptores de Express
+│   ├── error.middleware.js   # Manejador centralizado de excepciones y validaciones
+│   └── logger.middleware.js  # Registro de visitas con fs.appendFile
+├── models/                   # Definición de entidades y asociaciones del ORM
+│   ├── index.js              # Inicialización de Sequelize y relaciones (User 1:N Order)
+│   ├── order.model.js        # Modelo de Pedido / Orden
+│   └── user.model.js         # Modelo de Usuario
+├── public/                   # Frontend estático servido con express.static
+│   ├── index.html            # Panel web interactivo con botones de prueba
+│   └── styles.css            # Estilos visuales
+├── routes/                   # Definición de endpoints HTTP con express.Router
+│   ├── general.routes.js     # Enrutador para / y /status
+│   └── user.routes.js        # Enrutador para /usuarios y sub-recursos
+├── services/                 # Capa de lógica de negocio y consultas a la base de datos
+│   └── user.service.js       # Operaciones de persistencia, transacciones y SQL puro
 ├── .env.example              # Plantilla de variables de entorno
-├── .env                      # Variables de entorno locales (puerto, etc.)
-├── .gitignore                # Archivos y directorios excluidos de Git
-├── index.js                  # Punto de entrada principal e inicialización de Express
-├── package.json              # Configuración de dependencias y scripts de npm
-└── README.md                 # Documentación completa del proyecto
+├── .env                      # Variables de entorno locales
+├── .gitignore                # Archivos excluidos de Git (node_modules, .env, etc.)
+├── database.sqlite           # Base de datos relacional local (generada automáticamente)
+├── index.js                  # Entrada principal: conexión a BD, seed inicial y escucha
+├── package.json              # Metadatos, scripts (start, dev) y dependencias
+└── README.md                 # Documentación técnica completa
 ```
 
 ---
 
 ## ⚙️ Instalación y Configuración
 
-1. **Clonar o descargar el repositorio:**
+1. **Clonar el repositorio:**
    ```bash
-   git clone <URL_DEL_REPOSITORIO>
-   cd "proyecto curso sence"
+   git clone https://github.com/david-tkd203/project-sence.git
+   cd project-sence
    ```
 
-2. **Instalar las dependencias:**
+2. **Instalar dependencias:**
    ```bash
    npm install
    ```
 
-3. **Configurar las variables de entorno:**
-   Copiar el archivo `.env.example` como `.env`:
+3. **Configurar variables de entorno:**
    ```bash
    cp .env.example .env
    ```
-   *El archivo `.env` define por defecto `PORT=3000`.*
+   *Por defecto, `.env` está configurado con `DB_DIALECT=sqlite`, lo cual no requiere instalar ni configurar motores externos de bases de datos. Si se desea usar PostgreSQL o MySQL, basta con cambiar los parámetros en `.env`.*
 
 ---
 
 ## 🚀 Ejecución del Servidor
 
-El archivo `package.json` incluye dos scripts principales:
-
-- **Modo Producción / Estándar:**
-  ```bash
-  npm start
-  ```
-  Ejecuta el servidor directamente con `node index.js`.
-
-- **Modo Desarrollo (con recarga automática):**
+- **Modo Desarrollo (con recarga automática mediante Nodemon):**
   ```bash
   npm run dev
   ```
-  Ejecuta el servidor utilizando `nodemon index.js`, reiniciando automáticamente el proceso ante cambios en el código.
 
-Al iniciar exitosamente, la terminal mostrará:
-```text
-==============================================
-           Servidor iniciado
-🚀 Servidor Express escuchando en: http://localhost:3000
-📁 Modo: development
-==============================================
-```
+- **Modo Producción:**
+  ```bash
+  npm start
+  ```
+
+Al arrancar, el servidor automáticamente:
+1. Verifica la conexión a la base de datos relacional.
+2. Sincroniza las tablas (`User` y `Order`).
+3. Pobla la base de datos con al menos 3 usuarios simulados con pedidos si está vacía.
+4. Muestra en consola el mensaje `"Servidor iniciado"` y el puerto activo.
 
 ---
 
-## 🌐 Endpoints y Rutas Disponibles
+## 🌐 Endpoints y Rutas de la API
 
-| Método | Ruta | Formato de Respuesta | Descripción |
+### Rutas Generales (Módulo #6)
+| Método | Ruta | Descripción | Formato |
 |---|---|---|---|
-| `GET` | `/` | HTML | Renderiza y sirve la página web estática de bienvenida desde `public/index.html`. |
-| `GET` | `/status` | JSON | Retorna el estado del servidor, uptime, versión de Node y timestamp. |
-| `GET` | `*` | JSON | Manejador global de rutas inexistentes (Error 404). |
+| `GET` | `/` | Vista web con panel interactivo de prueba | HTML |
+| `GET` | `/status` | Estado operativo del servidor, uptime y fecha | JSON |
 
-### Ejemplo de Respuesta `GET /status` (JSON):
-```json
-{
-  "status": "OK",
-  "message": "El servidor Express está funcionando correctamente.",
-  "data": {
-    "uptimeSeconds": 124,
-    "environment": "development",
-    "nodeVersion": "v18.20.0",
-    "timestamp": "2026-08-30T21:35:00.000Z"
-  }
-}
-```
+### Rutas de Datos y Usuarios (Módulo #7)
+| Método | Ruta | Descripción | Formato |
+|---|---|---|---|
+| `GET` | `/usuarios` | Lista todos los usuarios (sin contraseñas). Soporta `?nombre=` y `?rol=` | JSON |
+| `GET` | `/usuarios/:id` | Detalle de un usuario específico por su ID | JSON |
+| `POST` | `/usuarios` | Crea un nuevo usuario validando datos obligatorios | JSON |
+| `PUT` | `/usuarios/:id` | Modifica datos de un usuario (valida existencia previa) | JSON |
+| `DELETE` | `/usuarios/:id` | Elimina un usuario (valida existencia previa) | JSON |
+| `GET` | `/usuarios/:id/pedidos` | **Relación 1:N**: Obtiene usuario y sus pedidos usando `include` | JSON |
+| `POST` | `/usuarios/transaccion-test` | **Transaccionalidad**: Crea usuario + pedido con soporte de rollback | JSON |
+| `GET` | `/usuarios/comparacion-sql` | **ORM vs SQL**: Compara resultados y tiempos de ejecución | JSON |
 
 ---
 
-## 🧠 Justificaciones Técnicas de Diseño
+## 🧠 Respuestas a Justificaciones Técnicas (Módulo #7)
 
-### 1. Elección de `index.js` como Archivo Principal
-Se seleccionó `index.js` porque es la convención estándar en el ecosistema Node.js y JavaScript. Permite que herramientas como npm reconozcan el punto de entrada por defecto sin configuraciones adicionales y centraliza la configuración de Express, middlewares globales y la puesta en marcha del servidor.
-
-### 2. Justificación de Scripts en `package.json`
-- `npm start`: Comando estándar recomendado para entornos de producción y plataformas de despliegue en la nube (Heroku, Render, AWS), ejecutando `node index.js` con el menor consumo de memoria.
-- `npm run dev`: Utiliza `nodemon` como dependencia de desarrollo (`devDependencies`), agilizando el flujo de trabajo del desarrollador al evitar reinicios manuales ante cada cambio de archivo.
-
-### 3. Uso de la Carpeta `/public` y `express.static`
-Se utilizó la carpeta `/public` configurada con el middleware nativo `express.static('public')`. Esta decisión permite entregar recursos estáticos (HTML, CSS, imágenes, scripts de cliente) de forma directa y eficiente sin sobrecargar el enrutador de Express, separando la capa visual estática de la lógica de API del backend.
-
-### 4. Persistencia en Archivos Planos (`logs/log.txt`)
-Para cumplir con el almacenamiento básico sin base de datos, se implementó un middleware (`middlewares/logger.middleware.js`) que hace uso del método nativo asíncrono `fs.appendFile()`. 
-- **Ventaja**: No bloquea el *Event Loop* de Node.js al procesar solicitudes simultáneas.
-- **Formato**: Cada línea guarda `[fecha hora] Método: HTTP | Ruta: /ruta`, permitiendo auditoría y trazabilidad básica de las peticiones recibidas.
-
-### 5. Estructura de Carpetas (Separación de Responsabilidades)
-Se estructuró el código en 5 carpetas para sentar una base de arquitectura limpia:
-- `routes/`: Define endpoints y verbos HTTP.
-- `controllers/`: Contiene las funciones que ejecutan la lógica de respuesta.
-- `middlewares/`: Interceptores para tareas transversales (logging, futuras validaciones y autenticación).
-- `public/`: Contenido estático web.
-- `logs/`: Persistencia plana de eventos.
+### Lección 1: Conexión y Protección de Datos Sensibles
+- **¿Por qué elegiste ese cliente de conexión?**  
+  Se seleccionó **Sequelize** como ORM junto con el driver **SQLite** (`sqlite3`) como base de datos relacional predeterminada. Esta combinación permite portabilidad total: cualquier evaluador puede clonar y levantar el proyecto inmediatamente con `npm start` sin necesidad de instalar Docker ni configurar servidores MySQL/PostgreSQL externos. A la vez, Sequelize desacopla el dialecto SQL, permitiendo migrar a PostgreSQL o MySQL simplemente modificando las variables del archivo `.env`.
+- **¿Cómo se protegen los datos sensibles?**  
+  1. **En almacenamiento**: Las credenciales de conexión (`DB_USER`, `DB_PASS`, `PORT`) residen exclusivamente en el archivo `.env`, el cual está ignorado en `.gitignore`.
+  2. **En consultas y respuestas**: En el servicio (`user.service.js`), todas las consultas de usuarios aplican `attributes: { exclude: ['password'] }`, impidiendo que los hashes de contraseñas u otros datos confidenciales salgan hacia los clientes HTTP.
 
 ---
 
-## 🔮 Reflexión y Proyección a Futuro (Módulos #7 y #8)
+### Lección 2: Obtención de Datos y Filtrado
+- Los resultados de `GET /usuarios` son sanitizados antes de enviarse.
+- Se implementó filtrado por query params (`?nombre=Juan` usando operadores `Op.like` y `?rol=cliente`), permitiendo búsquedas dinámicas sin inyección de SQL.
 
-Esta primera versión del proyecto establece una arquitectura sólida, desacoplada y predecible:
-- **Hacia el Módulo #7 (Base de Datos & ORM)**: La carpeta `controllers/` permitirá reemplazar fácilmente las respuestas estáticas por consultas asíncronas a modelos de datos creados con **Sequelize (PostgreSQL)** o **Mongoose (MongoDB)**, agregando una carpeta `models/` y operaciones CRUD completas.
-- **Hacia el Módulo #8 (Seguridad, JWT & Subida de Archivos)**: La carpeta `middlewares/` alojará el middleware de validación de tokens `verifyToken` con `jsonwebtoken` para proteger rutas privadas, así como la configuración de `multer` para procesar y validar la subida de imágenes y archivos hacia el servidor.
+---
+
+### Lección 3: Modificación Controlada y Validaciones
+- **¿Por qué decidiste actualizar sólo ciertos campos en el `PUT`?**  
+  Por principio de seguridad (*Mass Assignment Protection*). En una API segura no se debe permitir que un usuario modifique arbitrariamente atributos críticos como el `id`, la fecha de creación `createdAt`, o eleve sus privilegios cambiando su propio `rol` a `administrador` sin validación. Por ello, `updateUser` solo permite modificar explícitamente `nombre`, `rol` y `activo`.
+- **¿Qué validaciones aplicaste para evitar errores?**  
+  1. **Validación de existencia previa**: Si el ID no existe en la base de datos, se responde con un código `404 Not Found` en lugar de fallar silenciosamente.
+  2. **Validaciones a nivel de modelo Sequelize**: Validación de formato de email (`isEmail`), no vacíos (`notEmpty`) y valores permitidos para el rol (`isIn: [['cliente', 'administrador', 'invitado']]`).
+
+---
+
+### Lección 4: Transaccionalidad y Rollback
+- **Operación atómica**: La función `createUsuarioConPedidoTransaccion` utiliza `sequelize.transaction()`. Se ejecutan dos acciones dependientes: (1) crear el usuario y (2) registrar su pedido de bienvenida.
+- **Rollback garantizado**: Si la segunda operación falla o si se envía el flag `{ "forzarError": true }`, Sequelize ejecuta inmediatamente `t.rollback()`, asegurando que el usuario creado en el paso 1 sea revertido y no queden datos huérfanos.
+- **Evidencia de auditoría**: Las transacciones fallidas se registran automáticamente en el archivo plano `logs/log.txt` con fecha, hora, motivo del error y datos involucrados (cumpliendo la Tarea PLUS de la lección).
+
+---
+
+### Lección 5: Comparación ORM vs SQL Tradicional
+- **¿Qué ventajas encontraste usando ORM frente al cliente SQL tradicional?**
+  1. **Seguridad contra Inyección SQL**: El ORM parametriza automáticamente todas las consultas.
+  2. **Mantenibilidad y Productividad**: No requiere concatenar strings de SQL; los modelos representan directamente las entidades del dominio con validaciones integradas.
+  3. **Independencia del Motor de BD**: El mismo código JavaScript funciona sobre SQLite, PostgreSQL, MySQL o MariaDB.
+- Se implementó el endpoint `GET /usuarios/comparacion-sql` que ejecuta la misma consulta mediante `User.findAll()` y `sequelize.query()` midiendo tiempos en milisegundos para verificar paridad de resultados.
+
+---
+
+### Lección 6: Relaciones 1:N en el ORM
+- Se estableció la relación entre `User` y `Order`:
+  ```javascript
+  User.hasMany(Order, { foreignKey: 'userId', as: 'pedidos', onDelete: 'CASCADE' });
+  Order.belongsTo(User, { foreignKey: 'userId', as: 'usuario' });
+  ```
+- El endpoint `GET /usuarios/:id/pedidos` utiliza el modificador `include: [{ model: Order, as: 'pedidos' }]` para resolver la consulta de ambas entidades en un solo viaje a la base de datos relacional.
+
+---
+
+## 🔮 Proyección al Módulo #8
+
+Con la capa de datos consolidada, el sistema queda 100% preparado para el siguiente nivel:
+1. **Autenticación JWT**: Creación de middleware de autenticación (`verifyToken`) para validar el token Bearer en rutas protegidas.
+2. **Subida de Archivos**: Integración de `multer` para permitir a los usuarios subir su foto de perfil a `public/uploads/` con validación de tipo MIME y tamaño máximo.

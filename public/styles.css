@@ -1,16 +1,23 @@
 /* ==============================================================================
-   Estilos Generales de la Aplicación
+   Estilos Generales de la Aplicación (Módulos #6 y #7)
    ============================================================================== */
 
 :root {
   --primary-color: #3b82f6;
   --primary-hover: #2563eb;
+  --secondary-color: #64748b;
+  --secondary-hover: #475569;
+  --success-color: #10b981;
+  --success-hover: #059669;
+  --warning-color: #f59e0b;
+  --warning-hover: #d97706;
+  --danger-color: #ef4444;
+  --danger-hover: #dc2626;
   --bg-color: #0f172a;
   --card-bg: #1e293b;
   --text-main: #f8fafc;
   --text-muted: #94a3b8;
   --border-color: #334155;
-  --accent-color: #10b981;
 }
 
 * {
@@ -32,7 +39,7 @@ body {
 
 .container {
   width: 100%;
-  max-width: 800px;
+  max-width: 900px;
 }
 
 .header {
@@ -73,61 +80,91 @@ body {
 
 .card h2 {
   font-size: 1.4rem;
-  margin-bottom: 1rem;
-  color: var(--accent-color);
+  margin-bottom: 0.5rem;
+  color: var(--success-color);
 }
 
 .card p {
   color: #cbd5e1;
   line-height: 1.6;
+  margin-bottom: 1.25rem;
+}
+
+.buttons-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 0.75rem;
   margin-bottom: 1.5rem;
-}
-
-code {
-  background-color: rgba(0, 0, 0, 0.3);
-  color: #38bdf8;
-  padding: 0.2rem 0.4rem;
-  border-radius: 4px;
-  font-size: 0.9em;
-}
-
-.endpoints-box {
-  background-color: rgba(15, 23, 42, 0.6);
-  border: 1px solid var(--border-color);
-  border-radius: 8px;
-  padding: 1.25rem;
-  margin-bottom: 1.5rem;
-}
-
-.endpoints-box h3 {
-  font-size: 1.1rem;
-  margin-bottom: 0.75rem;
-}
-
-.endpoints-box ul {
-  list-style: none;
-}
-
-.endpoints-box li {
-  margin-bottom: 0.75rem;
-  line-height: 1.5;
 }
 
 .btn {
-  display: inline-block;
-  background-color: var(--primary-color);
-  color: white;
-  text-decoration: none;
-  padding: 0.5rem 1rem;
-  border-radius: 6px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  padding: 0.65rem 1rem;
+  border-radius: 8px;
   font-weight: 500;
-  font-size: 0.875rem;
-  margin-top: 0.5rem;
-  transition: background-color 0.2s ease;
+  font-size: 0.85rem;
+  cursor: pointer;
+  border: none;
+  transition: all 0.2s ease;
+  color: white;
 }
 
-.btn:hover {
-  background-color: var(--primary-hover);
+.btn-primary { background-color: var(--primary-color); }
+.btn-primary:hover { background-color: var(--primary-hover); }
+
+.btn-secondary { background-color: var(--secondary-color); }
+.btn-secondary:hover { background-color: var(--secondary-hover); }
+
+.btn-success { background-color: var(--success-color); }
+.btn-success:hover { background-color: var(--success-hover); }
+
+.btn-warning { background-color: var(--warning-color); color: #000; font-weight: 600; }
+.btn-warning:hover { background-color: var(--warning-hover); }
+
+.btn-danger { background-color: var(--danger-color); }
+.btn-danger:hover { background-color: var(--danger-hover); }
+
+.output-container {
+  background-color: #0b1120;
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  overflow: hidden;
+  margin-bottom: 1.5rem;
+}
+
+.output-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.6rem 1rem;
+  background-color: rgba(255, 255, 255, 0.03);
+  border-bottom: 1px solid var(--border-color);
+  font-size: 0.85rem;
+  color: var(--text-muted);
+}
+
+.badge-status {
+  padding: 0.2rem 0.6rem;
+  border-radius: 4px;
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+.badge-ok { background-color: rgba(16, 185, 129, 0.2); color: #34d399; }
+.badge-err { background-color: rgba(239, 68, 68, 0.2); color: #f87171; }
+.badge-loading { background-color: rgba(59, 130, 246, 0.2); color: #60a5fa; }
+
+pre {
+  padding: 1rem;
+  font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+  font-size: 0.85rem;
+  color: #38bdf8;
+  max-height: 260px;
+  overflow-y: auto;
+  white-space: pre-wrap;
+  word-wrap: break-word;
 }
 
 .features-grid {
@@ -151,7 +188,7 @@ code {
 }
 
 .feature-item p {
-  font-size: 0.875rem;
+  font-size: 0.85rem;
   margin-bottom: 0;
   color: var(--text-muted);
 }

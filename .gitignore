@@ -4,6 +4,9 @@ node_modules/
 # Archivos de entorno que contienen secretos o configuraciones locales
 .env
 
+# Archivos de base de datos SQLite locales
+*.sqlite
+
 # Archivos de registro del sistema operativo
 .DS_Store
 Thumbs.db

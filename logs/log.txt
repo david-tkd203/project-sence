@@ -2,3 +2,13 @@
 [2026-08-30 21:30:15] Método: GET | Ruta: /status
 [2026-08-30 21:30:45] Método: GET | Ruta: /
 [2026-08-31 21:39:33] Método: GET | Ruta: /status
+[2026-09-07 21:36:58] Método: GET | Ruta: /usuarios
+[2026-09-07 21:36:58] Método: GET | Ruta: /usuarios?rol=cliente
+[2026-09-07 21:36:58] Método: GET | Ruta: /usuarios/1/pedidos
+[2026-09-07 21:36:58] Método: POST | Ruta: /usuarios
+[2026-09-07 21:36:58] Método: PUT | Ruta: /usuarios/4
+[2026-09-07 21:36:58] Método: DELETE | Ruta: /usuarios/4
+[2026-09-07 21:36:58] Método: DELETE | Ruta: /usuarios/999999
+[2026-09-07 21:36:58] Método: POST | Ruta: /usuarios/transaccion-test
+[2026-09-07 21:36:58] [TRANSACCIÓN FALLIDA - ROLLBACK EJECUTADO] Motivo: Simulación de error forzado: Falló la creación del pedido, ejecutando Rollback. | Datos: {"usuario":"falla@test.com"}
+[2026-09-07 21:36:58] Método: GET | Ruta: /usuarios/comparacion-sql

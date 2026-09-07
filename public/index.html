@@ -3,54 +3,136 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Proyecto Backend - Módulo #6</title>
+  <title>Proyecto Backend - Módulo #6 & #7</title>
   <link rel="stylesheet" href="/styles.css">
 </head>
 <body>
   <div class="container">
     <header class="header">
-      <div class="badge">Node.js & Express</div>
-      <h1>Evaluación Módulo #6: Primeros Pasos con Node y Express</h1>
-      <p class="subtitle">Estructura base, rutas modulares, contenido estático y persistencia plana en archivo.</p>
+      <div class="badge">Node.js + Express + Sequelize ORM</div>
+      <h1>Evaluación Backend: Módulo #6 y #7</h1>
+      <p class="subtitle">Persistencia relacional, CRUD completo, transacciones con Rollback y relaciones 1:N.</p>
     </header>
 
     <main class="card">
-      <h2>🚀 Servidor Iniciado y Operativo</h2>
-      <p>Esta página HTML estática es servida directamente desde la carpeta pública mediante el middleware <code>express.static('public')</code>.</p>
-      
-      <div class="endpoints-box">
-        <h3>Rutas Disponibles:</h3>
-        <ul>
-          <li>
-            <strong>GET <code>/</code></strong>: Vista de inicio HTML (Página actual).
-          </li>
-          <li>
-            <strong>GET <code>/status</code></strong>: Endpoint público que retorna el estado del servidor en formato <strong>JSON</strong>.
-            <br>
-            <a href="/status" target="_blank" class="btn">Probar /status (JSON)</a>
-          </li>
-        </ul>
+      <h2>🚀 Panel Interactivo de Endpoints</h2>
+      <p>Hacé click en los botones para probar en tiempo real las operaciones sobre la base de datos relacional:</p>
+
+      <div class="buttons-grid">
+        <button class="btn btn-primary" onclick="ejecutarConsulta('/status')">
+          ⚙️ Estado Servidor (/status)
+        </button>
+        <button class="btn btn-primary" onclick="ejecutarConsulta('/usuarios')">
+          👥 Listar Usuarios (GET /usuarios)
+        </button>
+        <button class="btn btn-secondary" onclick="ejecutarConsulta('/usuarios?rol=cliente')">
+          🔍 Filtrar por Rol (GET /usuarios?rol=cliente)
+        </button>
+        <button class="btn btn-secondary" onclick="ejecutarConsulta('/usuarios/1/pedidos')">
+          📦 Relación 1:N (GET /usuarios/1/pedidos)
+        </button>
+        <button class="btn btn-warning" onclick="ejecutarConsulta('/usuarios/comparacion-sql')">
+          ⚡ Comparar ORM vs SQL Manual
+        </button>
+        <button class="btn btn-success" onclick="probarTransaccion(false)">
+          ✅ Transacción Exitosa (COMMIT)
+        </button>
+        <button class="btn btn-danger" onclick="probarTransaccion(true)">
+          🛡️ Transacción con Falla (ROLLBACK)
+        </button>
+      </div>
+
+      <div class="output-container">
+        <div class="output-header">
+          <span id="endpoint-label">Respuesta del Servidor (JSON):</span>
+          <span id="status-badge" class="badge-status">Listo</span>
+        </div>
+        <pre id="json-output">// Presioná un botón arriba para ejecutar la petición...</pre>
       </div>
 
       <div class="features-grid">
         <div class="feature-item">
-          <h4>📁 Arquitectura Modular</h4>
-          <p>Estructurado en 5 carpetas: <code>routes/</code>, <code>controllers/</code>, <code>middlewares/</code>, <code>public/</code> y <code>logs/</code>.</p>
+          <h4>🗄️ ORM Sequelize</h4>
+          <p>Conexión relacional segura con modelos <code>User</code> y <code>Order</code> y sanitización de datos sensibles.</p>
         </div>
         <div class="feature-item">
-          <h4>📝 Persistencia Plana</h4>
-          <p>Cada visita a las rutas se registra automáticamente en <code>logs/log.txt</code> usando <code>fs.appendFile</code>.</p>
+          <h4>🔄 Atomicidad y Transacciones</h4>
+          <p>Operaciones consecutivas protegidas con <code>sequelize.transaction()</code> y rollback asegurado ante fallas.</p>
         </div>
         <div class="feature-item">
-          <h4>⚙️ Variables de Entorno</h4>
-          <p>Configuración dinámica del puerto mediante <code>dotenv</code> y <code>.env</code>.</p>
+          <h4>📝 Auditoría y Logs</h4>
+          <p>Persistencia en <code>logs/log.txt</code> de accesos y de transacciones fallidas.</p>
         </div>
       </div>
     </main>
 
     <footer class="footer">
-      <p>Desarrollado para la Evaluación de Backend (Módulo #6, #7 y #8) - Alkemy / Sence</p>
+      <p>Evaluación de Backend (Módulo #6, #7 y #8) - Alkemy / Sence</p>
     </footer>
   </div>
+
+  <script>
+    async function ejecutarConsulta(url) {
+      const output = document.getElementById('json-output');
+      const label = document.getElementById('endpoint-label');
+      const badge = document.getElementById('status-badge');
+
+      label.innerText = `Consultando: GET ${url}...`;
+      badge.innerText = 'Cargando...';
+      badge.className = 'badge-status badge-loading';
+
+      try {
+        const response = await fetch(url);
+        const data = await response.json();
+        output.textContent = JSON.stringify(data, null, 2);
+        badge.innerText = `${response.status} ${response.statusText}`;
+        badge.className = response.ok ? 'badge-status badge-ok' : 'badge-status badge-err';
+      } catch (err) {
+        output.textContent = `Error al conectar: ${err.message}`;
+        badge.innerText = 'Error';
+        badge.className = 'badge-status badge-err';
+      }
+    }
+
+    async function probarTransaccion(forzarError) {
+      const output = document.getElementById('json-output');
+      const label = document.getElementById('endpoint-label');
+      const badge = document.getElementById('status-badge');
+
+      const url = '/usuarios/transaccion-test';
+      label.innerText = `Ejecutando: POST ${url} (forzarError: ${forzarError})...`;
+      badge.innerText = 'Ejecutando Transacción...';
+      badge.className = 'badge-status badge-loading';
+
+      try {
+        const response = await fetch(url, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            forzarError: forzarError,
+            usuario: {
+              nombre: forzarError ? 'Usuario Fallido' : 'Usuario Exitoso',
+              email: `test_${Date.now()}@transaccion.com`,
+              password: 'passSeguro123',
+              rol: 'cliente'
+            },
+            pedido: {
+              descripcion: forzarError ? 'Pedido que fallará' : 'Pedido de prueba transaccional',
+              monto: 150.00
+            }
+          })
+        });
+
+        const data = await response.json();
+        output.textContent = JSON.stringify(data, null, 2);
+        badge.innerText = `${response.status} ${response.statusText}`;
+        badge.className = response.ok ? 'badge-status badge-ok' : 'badge-status badge-err';
+      } catch (err) {
+        output.textContent = `Error en la solicitud: ${err.message}`;
+        badge.innerText = 'Error';
+        badge.className = 'badge-status badge-err';
+      }
+    }
+  </script>
 </body>
 </html>
