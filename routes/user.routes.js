@@ -1,13 +1,15 @@
 // ==============================================================================
 // Enrutador de Usuarios y Base de Datos (routes/user.routes.js)
 // ==============================================================================
-// Define los endpoints RESTful para la gestión de usuarios, pedidos,
-// transacciones con rollback y comparación ORM vs SQL.
+// Define los endpoints RESTful para usuarios y pedidos.
+// Las rutas de modificación de datos (POST, PUT, DELETE) están securizadas
+// mediante el middleware verifyToken (Módulo #8).
 // ==============================================================================
 
 const express = require('express');
 const router = express.Router();
 const userController = require('../controllers/user.controller');
+const { verifyToken } = require('../middlewares/auth.middleware');
 
 // Lección 5: Comparación entre consulta SQL manual y métodos de ORM Sequelize
 router.get('/comparacion-sql', userController.compareSqlOrm);
@@ -24,13 +26,18 @@ router.get('/:id/pedidos', userController.getUserWithOrders);
 // Detalle de un usuario por ID
 router.get('/:id', userController.getUserById);
 
-// Lección 3: Crear usuario
-router.post('/', userController.createUser);
+// ==============================================================================
+// Rutas Protegidas mediante JWT (Lección 4 - Módulo #8)
+// Solo accesibles enviando 'Authorization: Bearer <token>'
+// ==============================================================================
 
-// Lección 3: Modificar usuario por ID
-router.put('/:id', userController.updateUser);
+// Crear usuario (protegido con JWT)
+router.post('/', verifyToken, userController.createUser);
 
-// Lección 3: Eliminar usuario por ID (con validación de existencia previa)
-router.delete('/:id', userController.deleteUser);
+// Modificar usuario por ID (protegido con JWT)
+router.put('/:id', verifyToken, userController.updateUser);
+
+// Eliminar usuario por ID (protegido con JWT)
+router.delete('/:id', verifyToken, userController.deleteUser);
 
 module.exports = router;

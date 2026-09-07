@@ -7,6 +7,10 @@ node_modules/
 # Archivos de base de datos SQLite locales
 *.sqlite
 
+# Archivos subidos por usuarios (manteniendo la carpeta vía .gitkeep)
+public/uploads/*
+!public/uploads/.gitkeep
+
 # Archivos de registro del sistema operativo
 .DS_Store
 Thumbs.db

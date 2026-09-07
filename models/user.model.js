@@ -2,7 +2,7 @@
 // Modelo de Usuario (models/user.model.js)
 // ==============================================================================
 // Representa la tabla 'usuarios' en la base de datos relacional.
-// Define atributos, tipos de datos y validaciones para garantizar la integridad.
+// Define atributos, tipos de datos, avatar para subida de archivos y validaciones.
 // ==============================================================================
 
 const { DataTypes } = require('sequelize');
@@ -48,6 +48,11 @@ module.exports = (sequelize) => {
           msg: 'El rol debe ser cliente, administrador o invitado'
         }
       }
+    },
+    avatar: {
+      type: DataTypes.STRING(255),
+      allowNull: true,
+      defaultValue: null
     },
     activo: {
       type: DataTypes.BOOLEAN,

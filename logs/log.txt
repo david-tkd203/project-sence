@@ -12,3 +12,8 @@
 [2026-09-07 21:36:58] Método: POST | Ruta: /usuarios/transaccion-test
 [2026-09-07 21:36:58] [TRANSACCIÓN FALLIDA - ROLLBACK EJECUTADO] Motivo: Simulación de error forzado: Falló la creación del pedido, ejecutando Rollback. | Datos: {"usuario":"falla@test.com"}
 [2026-09-07 21:36:58] Método: GET | Ruta: /usuarios/comparacion-sql
+[2026-09-07 22:24:05] Método: POST | Ruta: /auth/login
+[2026-09-07 22:25:10] Método: POST | Ruta: /auth/login
+[2026-09-07 22:25:10] Método: POST | Ruta: /usuarios
+[2026-09-07 22:25:10] Método: POST | Ruta: /usuarios
+[2026-09-07 22:25:10] Método: POST | Ruta: /upload

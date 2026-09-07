@@ -1,9 +1,13 @@
 // ==============================================================================
-// Archivo Principal del Servidor (index.js)
+// Archivo Principal del Servidor (index.js) - Módulos #6, #7 y #8
 // ==============================================================================
-// Punto de entrada de la aplicación.
-// Configura variables de entorno, conecta la base de datos relacional con Sequelize,
-// sincroniza modelos con datos semilla iniciales, registra rutas y maneja errores.
+// Punto de entrada de la aplicación Express consolidada.
+// Integra:
+// - Variables de entorno (.env)
+// - Base de datos relacional con Sequelize
+// - Autenticación y protección de rutas con JWT
+// - Subida y validación de archivos con Multer
+// - Logging en archivos planos y manejo centralizado de errores
 // ==============================================================================
 
 // 1. Cargar variables de entorno desde el archivo .env
@@ -12,47 +16,68 @@ require('dotenv').config();
 // 2. Importar paquetes y dependencias necesarias
 const express = require('express');
 const path = require('path');
+const fs = require('fs');
+const bcrypt = require('bcryptjs');
 
 // 3. Importar configuración de BD, modelos y asociaciones
 const { testConnection } = require('./config/database');
 const { sequelize, User, Order } = require('./models');
 
-// 4. Importar middlewares y enrutadores personalizados
+// 4. Importar middlewares personalizados
 const requestLogger = require('./middlewares/logger.middleware');
 const errorHandler = require('./middlewares/error.middleware');
+
+// 5. Importar enrutadores modulares
 const generalRoutes = require('./routes/general.routes');
 const userRoutes = require('./routes/user.routes');
+const authRoutes = require('./routes/auth.routes');
+const uploadRoutes = require('./routes/upload.routes');
 
-// 5. Inicializar la aplicación Express
+// 6. Inicializar la aplicación Express
 const app = express();
 
-// 6. Configurar el puerto desde las variables de entorno (.env) o usar el puerto 3000 por defecto
+// 7. Configurar el puerto desde las variables de entorno o 3000 por defecto
 const PORT = process.env.PORT || 3000;
 
+// Asegurar existencia de la carpeta public/uploads
+const uploadsDir = path.join(__dirname, 'public', 'uploads');
+if (!fs.existsSync(uploadsDir)) {
+  fs.mkdirSync(uploadsDir, { recursive: true });
+}
+
 // ==============================================================================
-// Configuración de Middlewares
+// Configuración de Middlewares Globales
 // ==============================================================================
 
-// Middleware para procesar cuerpos de solicitud en formato JSON
+// Procesar cuerpos de solicitud en formato JSON
 app.use(express.json());
 
-// Middleware para procesar datos codificados en URL
+// Procesar datos codificados en URL (formularios tradicionales)
 app.use(express.urlencoded({ extended: true }));
 
-// Middleware para servir archivos estáticos desde la carpeta 'public'
+// Servir archivos estáticos del frontend desde la carpeta 'public'
 app.use(express.static(path.join(__dirname, 'public')));
 
-// Middleware de registro en archivo plano (guarda visitas en logs/log.txt)
+// Servir específicamente la carpeta de uploads de manera accesible y organizada
+app.use('/uploads', express.static(uploadsDir));
+
+// Middleware de registro en archivo plano (guarda accesos en logs/log.txt)
 app.use(requestLogger);
 
 // ==============================================================================
-// Registro de Rutas
+// Registro de Rutas Modulares
 // ==============================================================================
 
 // Rutas generales públicas (/, /status)
 app.use('/', generalRoutes);
 
-// Rutas de datos con ORM Sequelize (/usuarios)
+// Rutas de autenticación (POST /auth/register, POST /auth/login)
+app.use('/auth', authRoutes);
+
+// Rutas de subida de archivos (POST /upload - protegido con JWT)
+app.use('/upload', uploadRoutes);
+
+// Rutas de usuarios y base de datos (/usuarios - mutaciones protegidas con JWT)
 app.use('/usuarios', userRoutes);
 
 // Manejador de rutas no encontradas (404)
@@ -64,26 +89,30 @@ app.use((req, res, next) => {
   });
 });
 
-// Middleware global de manejo de errores
+// Middleware global de manejo centralizado de errores
 app.use(errorHandler);
 
 // ==============================================================================
-// Inicialización y Semilla de Base de Datos (Seed de al menos 3 usuarios)
+// Inicialización y Semilla de Base de Datos
 // ==============================================================================
 
 /**
- * Precarga al menos 3 registros simulados si la tabla de usuarios está vacía
+ * Precarga al menos 3 registros simulados con contraseñas encriptadas y pedidos asociados
  */
 async function seedDatabase() {
   const userCount = await User.count();
   if (userCount === 0) {
     console.log('🌱 Poblando base de datos con registros iniciales...');
     
-    // Crear 3 usuarios simulados (Lección 2)
+    // Hasheamos la contraseña por defecto para los usuarios iniciales
+    const salt = await bcrypt.genSalt(10);
+    const passwordHash = await bcrypt.hash('password123', salt);
+
+    // Crear 3 usuarios simulados
     const u1 = await User.create({
       nombre: 'Juan Pérez',
       email: 'juan.perez@empresa.com',
-      password: 'passwordSeguro123',
+      password: passwordHash,
       rol: 'administrador',
       activo: true
     });
@@ -91,7 +120,7 @@ async function seedDatabase() {
     const u2 = await User.create({
       nombre: 'María González',
       email: 'maria.gonzalez@empresa.com',
-      password: 'passwordSeguro456',
+      password: passwordHash,
       rol: 'cliente',
       activo: true
     });
@@ -99,12 +128,12 @@ async function seedDatabase() {
     const u3 = await User.create({
       nombre: 'Carlos Soto',
       email: 'carlos.soto@empresa.com',
-      password: 'passwordSeguro789',
+      password: passwordHash,
       rol: 'cliente',
       activo: false
     });
 
-    // Crear pedidos simulados para demostrar relaciones 1:N (Lección 6)
+    // Crear pedidos simulados (Relación 1:N)
     await Order.bulkCreate([
       { descripcion: 'Licencia anual de software Cloud', monto: 299.99, estado: 'completado', userId: u1.id },
       { descripcion: 'Servicio de consultoría técnica', monto: 450.00, estado: 'completado', userId: u1.id },
@@ -112,20 +141,20 @@ async function seedDatabase() {
       { descripcion: 'Pack de horas de soporte', monto: 120.50, estado: 'pendiente', userId: u3.id }
     ]);
 
-    console.log('✅ Base de datos poblada con 3 usuarios y pedidos de prueba.');
+    console.log('✅ Base de datos poblada con 3 usuarios y pedidos de prueba (contraseña común: password123).');
   }
 }
 
 /**
- * Función encargada de conectar la base de datos y arrancar el servidor HTTP
+ * Conexión y puesta en marcha del servidor
  */
 async function iniciarServidor() {
   try {
     // 1. Probar conexión a la base de datos
     await testConnection();
 
-    // 2. Sincronizar tablas del ORM
-    await sequelize.sync();
+    // 2. Sincronizar tablas del ORM (con alter: true para migrar automáticamente nuevos campos como avatar)
+    await sequelize.sync({ alter: true });
 
     // 3. Poblar datos simulados mínimos
     await seedDatabase();
@@ -137,6 +166,7 @@ async function iniciarServidor() {
       console.log(`🚀 Servidor Express escuchando en: http://localhost:${PORT}`);
       console.log(`📁 Modo: ${process.env.NODE_ENV || 'development'}`);
       console.log(`🗄️ Base de datos: ${process.env.DB_DIALECT || 'sqlite'}`);
+      console.log(`🔐 Autenticación JWT y Multer activados.`);
       console.log('====================================================');
     });
   } catch (error) {
@@ -144,7 +174,7 @@ async function iniciarServidor() {
   }
 }
 
-// Ejecutar la función de inicio
+// Iniciar aplicación
 iniciarServidor();
 
 module.exports = app;

@@ -3,135 +3,274 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Proyecto Backend - Módulo #6 & #7</title>
+  <title>Proyecto Backend Completo - Módulos #6, #7 y #8</title>
   <link rel="stylesheet" href="/styles.css">
 </head>
 <body>
   <div class="container">
     <header class="header">
-      <div class="badge">Node.js + Express + Sequelize ORM</div>
-      <h1>Evaluación Backend: Módulo #6 y #7</h1>
-      <p class="subtitle">Persistencia relacional, CRUD completo, transacciones con Rollback y relaciones 1:N.</p>
+      <div class="badge">Node.js + Express + Sequelize + JWT + Multer</div>
+      <h1>Evaluación Final: Módulos #6, #7 y #8</h1>
+      <p class="subtitle">API RESTful completa con Base de Datos, Autenticación JWT y Carga de Archivos.</p>
     </header>
 
     <main class="card">
-      <h2>🚀 Panel Interactivo de Endpoints</h2>
-      <p>Hacé click en los botones para probar en tiempo real las operaciones sobre la base de datos relacional:</p>
+      <!-- Sección 1: Autenticación JWT -->
+      <section class="section-box">
+        <h3>🔐 Autenticación JWT (Lección 4 - Módulo #8)</h3>
+        <p class="section-desc">Iniciá sesión para obtener un token JWT válido para consumir las rutas protegidas.</p>
+        <div class="login-form">
+          <input type="email" id="login-email" value="juan.perez@empresa.com" placeholder="Correo electrónico">
+          <input type="password" id="login-pass" value="password123" placeholder="Contraseña">
+          <button class="btn btn-primary" onclick="iniciarSesion()">🔑 Iniciar Sesión (POST /auth/login)</button>
+          <button class="btn btn-secondary" onclick="cerrarSesion()">Cerrar Sesión</button>
+        </div>
+        <div class="token-banner" id="token-banner">
+          <span id="token-status">⚠️ No hay token activo (Rutas protegidas darán error 401).</span>
+        </div>
+      </section>
 
-      <div class="buttons-grid">
-        <button class="btn btn-primary" onclick="ejecutarConsulta('/status')">
-          ⚙️ Estado Servidor (/status)
-        </button>
-        <button class="btn btn-primary" onclick="ejecutarConsulta('/usuarios')">
-          👥 Listar Usuarios (GET /usuarios)
-        </button>
-        <button class="btn btn-secondary" onclick="ejecutarConsulta('/usuarios?rol=cliente')">
-          🔍 Filtrar por Rol (GET /usuarios?rol=cliente)
-        </button>
-        <button class="btn btn-secondary" onclick="ejecutarConsulta('/usuarios/1/pedidos')">
-          📦 Relación 1:N (GET /usuarios/1/pedidos)
-        </button>
-        <button class="btn btn-warning" onclick="ejecutarConsulta('/usuarios/comparacion-sql')">
-          ⚡ Comparar ORM vs SQL Manual
-        </button>
-        <button class="btn btn-success" onclick="probarTransaccion(false)">
-          ✅ Transacción Exitosa (COMMIT)
-        </button>
-        <button class="btn btn-danger" onclick="probarTransaccion(true)">
-          🛡️ Transacción con Falla (ROLLBACK)
-        </button>
-      </div>
+      <!-- Sección 2: Subida de Archivos con Multer -->
+      <section class="section-box">
+        <h3>📁 Subida de Archivos con Multer (Lección 3 - Módulo #8)</h3>
+        <p class="section-desc">Subí una imagen (JPEG, PNG, WEBP, GIF, máx 2MB) hacia <code>public/uploads/</code> asociada al avatar de un usuario.</p>
+        <div class="upload-form">
+          <input type="file" id="upload-file" accept="image/*">
+          <input type="number" id="upload-userid" value="1" placeholder="ID Usuario para asociar avatar" style="width: 130px;">
+          <button class="btn btn-success" onclick="subirArchivo()">📤 Subir Archivo (POST /upload)</button>
+        </div>
+      </section>
 
+      <!-- Sección 3: Acciones Rápidas y Rutas Protegidas -->
+      <section class="section-box">
+        <h3>⚡ Acceso a Datos y Rutas RESTful</h3>
+        <div class="buttons-grid">
+          <button class="btn btn-primary" onclick="ejecutarConsulta('/status')">
+            ⚙️ Estado Servidor (/status)
+          </button>
+          <button class="btn btn-primary" onclick="ejecutarConsulta('/usuarios')">
+            👥 Listar Usuarios (GET /usuarios)
+          </button>
+          <button class="btn btn-secondary" onclick="ejecutarConsulta('/usuarios/1/pedidos')">
+            📦 Relación 1:N (GET /usuarios/1/pedidos)
+          </button>
+          <button class="btn btn-warning" onclick="probarRutaProtegidaSinToken()">
+            🛡️ Probar Mutación SIN Token (401)
+          </button>
+          <button class="btn btn-success" onclick="probarCrearUsuarioConToken()">
+            ➕ Crear Usuario CON Token (201)
+          </button>
+          <button class="btn btn-danger" onclick="probarTransaccion(true)">
+            🔄 Transacción con Rollback
+          </button>
+        </div>
+      </section>
+
+      <!-- Consola de Salida JSON -->
       <div class="output-container">
         <div class="output-header">
           <span id="endpoint-label">Respuesta del Servidor (JSON):</span>
           <span id="status-badge" class="badge-status">Listo</span>
         </div>
-        <pre id="json-output">// Presioná un botón arriba para ejecutar la petición...</pre>
+        <pre id="json-output">// Hacé click en cualquier acción para ejecutar la petición...</pre>
       </div>
 
+      <!-- Arquitectura de los 3 Módulos -->
       <div class="features-grid">
         <div class="feature-item">
-          <h4>🗄️ ORM Sequelize</h4>
-          <p>Conexión relacional segura con modelos <code>User</code> y <code>Order</code> y sanitización de datos sensibles.</p>
+          <h4>📦 Módulo #6: Fundamentos</h4>
+          <p>Servidor Express, modularización, contenido estático en <code>/public</code> y logs en <code>logs/log.txt</code>.</p>
         </div>
         <div class="feature-item">
-          <h4>🔄 Atomicidad y Transacciones</h4>
-          <p>Operaciones consecutivas protegidas con <code>sequelize.transaction()</code> y rollback asegurado ante fallas.</p>
+          <h4>🗄️ Módulo #7: Datos Relacionales</h4>
+          <p>Sequelize ORM, modelos relacionales 1:N (Usuarios y Pedidos), filtros y transacciones atómicas con rollback.</p>
         </div>
         <div class="feature-item">
-          <h4>📝 Auditoría y Logs</h4>
-          <p>Persistencia en <code>logs/log.txt</code> de accesos y de transacciones fallidas.</p>
+          <h4>🔐 Módulo #8: API Segura</h4>
+          <p>Endpoints RESTful, autenticación con JWT (Bearer), hashing con bcryptjs y carga de archivos con Multer.</p>
         </div>
       </div>
     </main>
 
     <footer class="footer">
-      <p>Evaluación de Backend (Módulo #6, #7 y #8) - Alkemy / Sence</p>
+      <p>Evaluación Integral Backend (Módulos #6, #7 y #8) - Alkemy / Sence</p>
     </footer>
   </div>
 
   <script>
-    async function ejecutarConsulta(url) {
-      const output = document.getElementById('json-output');
-      const label = document.getElementById('endpoint-label');
-      const badge = document.getElementById('status-badge');
+    let authToken = localStorage.getItem('jwt_token') || null;
+    actualizarVistaToken();
 
-      label.innerText = `Consultando: GET ${url}...`;
-      badge.innerText = 'Cargando...';
-      badge.className = 'badge-status badge-loading';
+    function actualizarVistaToken() {
+      const banner = document.getElementById('token-banner');
+      const statusText = document.getElementById('token-status');
+      if (authToken) {
+        banner.className = 'token-banner token-active';
+        statusText.innerHTML = `✅ <strong>Token JWT Activo:</strong> <code>${authToken.slice(0, 30)}...</code> (Listo para usar en cabecera Authorization)`;
+      } else {
+        banner.className = 'token-banner token-inactive';
+        statusText.innerHTML = `⚠️ No hay token activo. Las rutas protegidas devolverán <strong>401 Unauthorized</strong>.`;
+      }
+    }
+
+    async function iniciarSesion() {
+      const email = document.getElementById('login-email').value;
+      const password = document.getElementById('login-pass').value;
+
+      mostrarCargando('POST /auth/login');
+      try {
+        const res = await fetch('/auth/login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email, password })
+        });
+        const data = await res.json();
+        mostrarRespuesta(res, data);
+
+        if (res.ok && data.data && data.data.token) {
+          authToken = data.data.token;
+          localStorage.setItem('jwt_token', authToken);
+          actualizarVistaToken();
+        }
+      } catch (err) {
+        mostrarError(err);
+      }
+    }
+
+    function cerrarSesion() {
+      authToken = null;
+      localStorage.removeItem('jwt_token');
+      actualizarVistaToken();
+      document.getElementById('json-output').textContent = '// Sesión cerrada. Token eliminado.';
+    }
+
+    async function subirArchivo() {
+      const fileInput = document.getElementById('upload-file');
+      const userId = document.getElementById('upload-userid').value;
+
+      if (!fileInput.files[0]) {
+        alert('Por favor selecciona una imagen primero.');
+        return;
+      }
+
+      const formData = new FormData();
+      formData.append('archivo', fileInput.files[0]);
+      if (userId) formData.append('userId', userId);
+
+      mostrarCargando('POST /upload (con multipart/form-data y JWT)');
 
       try {
-        const response = await fetch(url);
-        const data = await response.json();
-        output.textContent = JSON.stringify(data, null, 2);
-        badge.innerText = `${response.status} ${response.statusText}`;
-        badge.className = response.ok ? 'badge-status badge-ok' : 'badge-status badge-err';
+        const headers = {};
+        if (authToken) headers['Authorization'] = `Bearer ${authToken}`;
+
+        const res = await fetch('/upload', {
+          method: 'POST',
+          headers: headers,
+          body: formData
+        });
+        const data = await res.json();
+        mostrarRespuesta(res, data);
       } catch (err) {
-        output.textContent = `Error al conectar: ${err.message}`;
-        badge.innerText = 'Error';
-        badge.className = 'badge-status badge-err';
+        mostrarError(err);
+      }
+    }
+
+    async function probarRutaProtegidaSinToken() {
+      mostrarCargando('POST /usuarios (SIN TOKEN - Prueba de seguridad)');
+      try {
+        const res = await fetch('/usuarios', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ nombre: 'Intruso', email: 'intruso@test.com', password: '123' })
+        });
+        const data = await res.json();
+        mostrarRespuesta(res, data);
+      } catch (err) {
+        mostrarError(err);
+      }
+    }
+
+    async function probarCrearUsuarioConToken() {
+      if (!authToken) {
+        alert('Primero debés iniciar sesión para obtener el token.');
+        return;
+      }
+      mostrarCargando('POST /usuarios (CON TOKEN JWT)');
+      try {
+        const res = await fetch('/usuarios', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${authToken}`
+          },
+          body: JSON.stringify({
+            nombre: 'Usuario Autenticado',
+            email: `autenticado_${Date.now()}@test.com`,
+            password: 'password123',
+            rol: 'cliente'
+          })
+        });
+        const data = await res.json();
+        mostrarRespuesta(res, data);
+      } catch (err) {
+        mostrarError(err);
+      }
+    }
+
+    async function ejecutarConsulta(url) {
+      mostrarCargando(`GET ${url}`);
+      try {
+        const res = await fetch(url);
+        const data = await res.json();
+        mostrarRespuesta(res, data);
+      } catch (err) {
+        mostrarError(err);
       }
     }
 
     async function probarTransaccion(forzarError) {
-      const output = document.getElementById('json-output');
-      const label = document.getElementById('endpoint-label');
-      const badge = document.getElementById('status-badge');
-
-      const url = '/usuarios/transaccion-test';
-      label.innerText = `Ejecutando: POST ${url} (forzarError: ${forzarError})...`;
-      badge.innerText = 'Ejecutando Transacción...';
-      badge.className = 'badge-status badge-loading';
-
+      mostrarCargando(`POST /usuarios/transaccion-test (forzarError: ${forzarError})`);
       try {
-        const response = await fetch(url, {
+        const res = await fetch('/usuarios/transaccion-test', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
             forzarError: forzarError,
-            usuario: {
-              nombre: forzarError ? 'Usuario Fallido' : 'Usuario Exitoso',
-              email: `test_${Date.now()}@transaccion.com`,
-              password: 'passSeguro123',
-              rol: 'cliente'
-            },
-            pedido: {
-              descripcion: forzarError ? 'Pedido que fallará' : 'Pedido de prueba transaccional',
-              monto: 150.00
-            }
+            usuario: { nombre: 'Usuario Transaccional', email: `test_${Date.now()}@test.com`, password: '123' },
+            pedido: { descripcion: 'Pedido de prueba', monto: 150.00 }
           })
         });
-
-        const data = await response.json();
-        output.textContent = JSON.stringify(data, null, 2);
-        badge.innerText = `${response.status} ${response.statusText}`;
-        badge.className = response.ok ? 'badge-status badge-ok' : 'badge-status badge-err';
+        const data = await res.json();
+        mostrarRespuesta(res, data);
       } catch (err) {
-        output.textContent = `Error en la solicitud: ${err.message}`;
-        badge.innerText = 'Error';
-        badge.className = 'badge-status badge-err';
+        mostrarError(err);
       }
+    }
+
+    function mostrarCargando(accion) {
+      const output = document.getElementById('json-output');
+      const label = document.getElementById('endpoint-label');
+      const badge = document.getElementById('status-badge');
+      label.innerText = `Ejecutando: ${accion}...`;
+      badge.innerText = 'Cargando...';
+      badge.className = 'badge-status badge-loading';
+      output.textContent = '// Esperando respuesta...';
+    }
+
+    function mostrarRespuesta(res, data) {
+      const output = document.getElementById('json-output');
+      const badge = document.getElementById('status-badge');
+      output.textContent = JSON.stringify(data, null, 2);
+      badge.innerText = `${res.status} ${res.statusText || (res.ok ? 'OK' : 'Error')}`;
+      badge.className = res.ok ? 'badge-status badge-ok' : 'badge-status badge-err';
+    }
+
+    function mostrarError(err) {
+      const output = document.getElementById('json-output');
+      const badge = document.getElementById('status-badge');
+      output.textContent = `Error en la solicitud: ${err.message}`;
+      badge.innerText = 'Error';
+      badge.className = 'badge-status badge-err';
     }
   </script>
 </body>

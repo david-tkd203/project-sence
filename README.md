@@ -1,8 +1,9 @@
-# Proyecto Node & Express Web App - Evaluación Módulos #6 y #7
+# Proyecto Integrador Backend - Módulos #6, #7 y #8 (ABP Alkemy / Sence)
 
-Aplicación backend desarrollada con **Node.js**, **Express** y el ORM **Sequelize**, correspondiente a las entregas de los **Módulos #6** (*Primeros pasos con Node y Express*) y **#7** (*Acceso a datos en aplicaciones Node*) del programa de formación (Alkemy / Sence).
-
-El proyecto implementa una arquitectura modular profesional con persistencia relacional en base de datos, operaciones CRUD completas, transaccionalidad atómica con rollback, relaciones 1:N entre entidades y registro de auditoría.
+Aplicación backend completa desarrollada con **Node.js**, **Express**, **Sequelize ORM**, **JWT (JSON Web Tokens)** y **Multer**, integrando todas las competencias y requerimientos de los tres módulos del programa:
+- **Módulo #6**: Estructura de servidor, rutas modulares, persistencia plana y contenido web estático.
+- **Módulo #7**: Persistencia relacional, modelos y relaciones 1:N, operaciones CRUD y transacciones con rollback.
+- **Módulo #8**: Exposición de una API RESTful profesional, autenticación y securización con JWT, y subida/validación de archivos con Multer.
 
 ---
 
@@ -12,15 +13,18 @@ El proyecto implementa una arquitectura modular profesional con persistencia rel
 2. [Estructura del Proyecto](#-estructura-del-proyecto)
 3. [Instalación y Configuración](#-instalación-y-configuración)
 4. [Ejecución del Servidor](#-ejecución-del-servidor)
-5. [Endpoints y Rutas de la API](#-endpoints-y-rutas-de-la-api)
-6. [Respuestas a Justificaciones Técnicas (Módulo #7)](#-respuestas-a-justificaciones-técnicas-módulo-7)
-   - [Lección 1: Conexión y Protección de Datos Sensibles](#lección-1-conexión-y-protección-de-datos-sensibles)
-   - [Lección 2: Obtención de Datos y Filtrado](#lección-2-obtención-de-datos-y-filtrado)
-   - [Lección 3: Modificación Controlada y Validaciones](#lección-3-modificación-controlada-y-validaciones)
-   - [Lección 4: Transaccionalidad y Rollback](#lección-4-transaccionalidad-y-rollback)
-   - [Lección 5: Comparación ORM vs SQL Tradicional](#lección-5-comparación-orm-vs-sql-tradicional)
-   - [Lección 6: Relaciones 1:N en el ORM](#lección-6-relaciones-1n-en-el-orm)
-7. [Proyección al Módulo #8 (Seguridad, JWT y Subida de Archivos)](#-proyección-al-módulo-8)
+5. [Guía de la API RESTful y Endpoints](#-guía-de-la-api-restful-y-endpoints)
+   - [Autenticación (JWT)](#1-autenticación-pública)
+   - [Usuarios y Datos](#2-usuarios-y-datos)
+   - [Subida de Archivos (Multer)](#3-subida-de-archivos)
+   - [Rutas Públicas y Estado](#4-rutas-públicas-y-estado)
+6. [Cómo Autenticarse y Consumir Rutas Protegidas](#-cómo-autenticarse-y-consumir-rutas-protegidas)
+7. [Respuestas a Justificaciones Técnicas (Módulo #8)](#-respuestas-a-justificaciones-técnicas-módulo-8)
+   - [Separación de Rutas y Controladores](#1-cómo-decidiste-separar-tus-rutas-y-controladores)
+   - [Validaciones de Entrada y Mutación de Datos](#2-qué-validaciones-realizaste-antes-de-insertarmodificar-datos)
+   - [Estrategia de Protección con JWT](#3-por-qué-decidiste-proteger-esas-rutas)
+   - [Almacenamiento del Token en el Cliente](#4-dónde-y-cómo-almacenas-el-token)
+8. [Reflexión Integradora de los Tres Módulos](#-reflexión-integradora-de-los-tres-módulos)
 
 ---
 
@@ -28,44 +32,51 @@ El proyecto implementa una arquitectura modular profesional con persistencia rel
 
 - **Node.js**: Versión 18.x o superior ([nodejs.org](https://nodejs.org/)).
 - **npm**: Versión 9.x o superior.
-- Sistema Operativo: Windows, Linux o macOS.
+- Sistema Operativo: Windows, macOS o Linux.
 
 ---
 
 ## 📁 Estructura del Proyecto
 
-El proyecto sigue una arquitectura modular en capas con estricta separación de responsabilidades:
+El proyecto aplica arquitectura modular en capas con separación neta de responsabilidades:
 
 ```text
 proyecto-curso-sence/
-├── config/                   # Configuración del servidor y base de datos
-│   └── database.js           # Conexión Sequelize con soporte multi-dialecto (.env)
-├── controllers/              # Controladores que reciben peticiones y dan formato a respuestas
-│   ├── general.controller.js # Controladores de rutas públicas (/, /status)
-│   └── user.controller.js    # Controladores CRUD, filtros, relaciones y transacciones
-├── logs/                     # Persistencia plana y logs de auditoría
+├── config/                   # Configuración del entorno y conexión a BD
+│   └── database.js           # Conexión Sequelize (SQLite por defecto, compatible con Postgres/MySQL)
+├── controllers/              # Controladores que reciben peticiones y devuelven respuestas
+│   ├── auth.controller.js    # Lógica de Login y Registro (generación de JWT)
+│   ├── general.controller.js # Controladores de vista HTML y estado del servidor
+│   ├── upload.controller.js  # Procesamiento de subida de archivos y asociación a usuario
+│   └── user.controller.js    # CRUD, filtros, relaciones y transacciones
+├── logs/                     # Persistencia de logs de auditoría
 │   └── log.txt               # Registro histórico de accesos y transacciones fallidas
-├── middlewares/              # Middlewares interceptores de Express
-│   ├── error.middleware.js   # Manejador centralizado de excepciones y validaciones
-│   └── logger.middleware.js  # Registro de visitas con fs.appendFile
-├── models/                   # Definición de entidades y asociaciones del ORM
-│   ├── index.js              # Inicialización de Sequelize y relaciones (User 1:N Order)
-│   ├── order.model.js        # Modelo de Pedido / Orden
-│   └── user.model.js         # Modelo de Usuario
-├── public/                   # Frontend estático servido con express.static
-│   ├── index.html            # Panel web interactivo con botones de prueba
-│   └── styles.css            # Estilos visuales
-├── routes/                   # Definición de endpoints HTTP con express.Router
-│   ├── general.routes.js     # Enrutador para / y /status
-│   └── user.routes.js        # Enrutador para /usuarios y sub-recursos
-├── services/                 # Capa de lógica de negocio y consultas a la base de datos
-│   └── user.service.js       # Operaciones de persistencia, transacciones y SQL puro
+├── middlewares/              # Interceptores y funciones intermedias
+│   ├── auth.middleware.js    # Validación de token JWT (Authorization: Bearer)
+│   ├── error.middleware.js   # Manejador centralizado de errores
+│   ├── logger.middleware.js  # Registro de visitas con fs.appendFile
+│   └── upload.middleware.js  # Configuración de Multer (filtros MIME y límites)
+├── models/                   # Modelos y asociaciones del ORM Sequelize
+│   ├── index.js              # Inicialización de asociaciones (User 1:N Order)
+│   ├── order.model.js        # Modelo de Pedidos
+│   └── user.model.js         # Modelo de Usuarios (incluye avatar)
+├── public/                   # Frontend estático servido por Express
+│   ├── index.html            # Panel interactivo para pruebas en vivo
+│   ├── styles.css            # Hoja de estilos moderna
+│   └── uploads/              # Directorio público donde se almacenan las imágenes
+├── routes/                   # Definición de endpoints modulares
+│   ├── auth.routes.js        # Rutas /auth/login y /auth/register
+│   ├── general.routes.js     # Rutas / y /status
+│   ├── upload.routes.js      # Ruta /upload (protegida con JWT)
+│   └── user.routes.js        # Rutas /usuarios (mutaciones protegidas con JWT)
+├── services/                 # Lógica de negocio y consultas a base de datos
+│   ├── auth.service.js       # Hashing con bcryptjs y firma de JWT
+│   └── user.service.js       # Consultas ORM, transacciones y SQL puro
 ├── .env.example              # Plantilla de variables de entorno
 ├── .env                      # Variables de entorno locales
-├── .gitignore                # Archivos excluidos de Git (node_modules, .env, etc.)
-├── database.sqlite           # Base de datos relacional local (generada automáticamente)
-├── index.js                  # Entrada principal: conexión a BD, seed inicial y escucha
-├── package.json              # Metadatos, scripts (start, dev) y dependencias
+├── .gitignore                # Exclusiones de Git (node_modules, .env, *.sqlite)
+├── index.js                  # Entrada principal: servidor, BD, middlewares y rutas
+├── package.json              # Metadatos, dependencias y scripts
 └── README.md                 # Documentación técnica completa
 ```
 
@@ -88,13 +99,12 @@ proyecto-curso-sence/
    ```bash
    cp .env.example .env
    ```
-   *Por defecto, `.env` está configurado con `DB_DIALECT=sqlite`, lo cual no requiere instalar ni configurar motores externos de bases de datos. Si se desea usar PostgreSQL o MySQL, basta con cambiar los parámetros en `.env`.*
 
 ---
 
 ## 🚀 Ejecución del Servidor
 
-- **Modo Desarrollo (con recarga automática mediante Nodemon):**
+- **Modo Desarrollo (con recarga automática):**
   ```bash
   npm run dev
   ```
@@ -105,89 +115,131 @@ proyecto-curso-sence/
   ```
 
 Al arrancar, el servidor automáticamente:
-1. Verifica la conexión a la base de datos relacional.
-2. Sincroniza las tablas (`User` y `Order`).
-3. Pobla la base de datos con al menos 3 usuarios simulados con pedidos si está vacía.
-4. Muestra en consola el mensaje `"Servidor iniciado"` y el puerto activo.
+1. Conecta la base de datos relacional y sincroniza los modelos.
+2. Si la base está vacía, precarga 3 usuarios de prueba con contraseñas hasheadas (`password123`) y pedidos asociados.
+3. Imprime en consola:
+   ```text
+   ====================================================
+                    Servidor iniciado
+   🚀 Servidor Express escuchando en: http://localhost:3000
+   📁 Modo: development
+   🗄️ Base de datos: sqlite
+   🔐 Autenticación JWT y Multer activados.
+   ====================================================
+   ```
 
 ---
 
-## 🌐 Endpoints y Rutas de la API
+## 🌐 Guía de la API RESTful y Endpoints
 
-### Rutas Generales (Módulo #6)
-| Método | Ruta | Descripción | Formato |
+### 1. Autenticación (Pública)
+| Método | Endpoint | Descripción | Body (JSON) |
 |---|---|---|---|
-| `GET` | `/` | Vista web con panel interactivo de prueba | HTML |
-| `GET` | `/status` | Estado operativo del servidor, uptime y fecha | JSON |
+| `POST` | `/auth/register` | Registra un nuevo usuario con contraseña hasheada | `{ "nombre", "email", "password", "rol" }` |
+| `POST` | `/auth/login` | Inicia sesión y retorna un token JWT válido por 2 horas | `{ "email", "password" }` |
 
-### Rutas de Datos y Usuarios (Módulo #7)
-| Método | Ruta | Descripción | Formato |
+### 2. Usuarios y Datos
+| Método | Endpoint | Protección | Descripción |
 |---|---|---|---|
-| `GET` | `/usuarios` | Lista todos los usuarios (sin contraseñas). Soporta `?nombre=` y `?rol=` | JSON |
-| `GET` | `/usuarios/:id` | Detalle de un usuario específico por su ID | JSON |
-| `POST` | `/usuarios` | Crea un nuevo usuario validando datos obligatorios | JSON |
-| `PUT` | `/usuarios/:id` | Modifica datos de un usuario (valida existencia previa) | JSON |
-| `DELETE` | `/usuarios/:id` | Elimina un usuario (valida existencia previa) | JSON |
-| `GET` | `/usuarios/:id/pedidos` | **Relación 1:N**: Obtiene usuario y sus pedidos usando `include` | JSON |
-| `POST` | `/usuarios/transaccion-test` | **Transaccionalidad**: Crea usuario + pedido con soporte de rollback | JSON |
-| `GET` | `/usuarios/comparacion-sql` | **ORM vs SQL**: Compara resultados y tiempos de ejecución | JSON |
+| `GET` | `/usuarios` | Pública | Lista usuarios (sin contraseñas). Filtros: `?rol=` y `?nombre=` |
+| `GET` | `/usuarios/:id` | Pública | Detalle de un usuario |
+| `POST` | `/usuarios` | **JWT (Bearer)** | Crea usuario |
+| `PUT` | `/usuarios/:id` | **JWT (Bearer)** | Modifica usuario existente (valida existencia) |
+| `DELETE` | `/usuarios/:id` | **JWT (Bearer)** | Elimina usuario (valida existencia previa) |
+| `GET` | `/usuarios/:id/pedidos`| Pública | Relación 1:N: Usuario con sus pedidos asociados |
+| `POST` | `/usuarios/transaccion-test`| Pública | Transaccionalidad con rollback garantizado |
+| `GET` | `/usuarios/comparacion-sql` | Pública | Comparación de tiempos y resultados: ORM vs SQL crudo |
+
+### 3. Subida de Archivos
+| Método | Endpoint | Protección | Tipo de Petición | Descripción |
+|---|---|---|---|---|
+| `POST` | `/upload` | **JWT (Bearer)** | `multipart/form-data` | Sube imagen (JPEG, PNG, WEBP, GIF, máx 2MB) y asocia al usuario |
+
+### 4. Rutas Públicas y Estado
+| Método | Endpoint | Descripción | Formato |
+|---|---|---|---|
+| `GET` | `/` | Panel web interactivo con consola en vivo | HTML |
+| `GET` | `/status` | Estado operativo del servidor, uptime y versión | JSON |
 
 ---
 
-## 🧠 Respuestas a Justificaciones Técnicas (Módulo #7)
+## 🔐 Cómo Autenticarse y Consumir Rutas Protegidas
 
-### Lección 1: Conexión y Protección de Datos Sensibles
-- **¿Por qué elegiste ese cliente de conexión?**  
-  Se seleccionó **Sequelize** como ORM junto con el driver **SQLite** (`sqlite3`) como base de datos relacional predeterminada. Esta combinación permite portabilidad total: cualquier evaluador puede clonar y levantar el proyecto inmediatamente con `npm start` sin necesidad de instalar Docker ni configurar servidores MySQL/PostgreSQL externos. A la vez, Sequelize desacopla el dialecto SQL, permitiendo migrar a PostgreSQL o MySQL simplemente modificando las variables del archivo `.env`.
-- **¿Cómo se protegen los datos sensibles?**  
-  1. **En almacenamiento**: Las credenciales de conexión (`DB_USER`, `DB_PASS`, `PORT`) residen exclusivamente en el archivo `.env`, el cual está ignorado en `.gitignore`.
-  2. **En consultas y respuestas**: En el servicio (`user.service.js`), todas las consultas de usuarios aplican `attributes: { exclude: ['password'] }`, impidiendo que los hashes de contraseñas u otros datos confidenciales salgan hacia los clientes HTTP.
+### 1. Obtener Token mediante Login:
+```bash
+curl -X POST http://localhost:3000/auth/login \
+  -H "Content-Type: application/json" \
+  -d '{"email":"juan.perez@empresa.com","password":"password123"}'
+```
+*Respuesta:*
+```json
+{
+  "status": "success",
+  "message": "Autenticación exitosa. Token generado correctamente.",
+  "data": {
+    "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+    "expiresIn": "2h",
+    "usuario": { "id": 1, "nombre": "Juan Pérez", "email": "juan.perez@empresa.com", "rol": "administrador" }
+  }
+}
+```
 
----
+### 2. Consumir una Ruta Protegida enviando el Token:
+```bash
+curl -X POST http://localhost:3000/usuarios \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..." \
+  -d '{"nombre":"Ana Torres","email":"ana@correo.com","password":"passSeguro456","rol":"cliente"}'
+```
 
-### Lección 2: Obtención de Datos y Filtrado
-- Los resultados de `GET /usuarios` son sanitizados antes de enviarse.
-- Se implementó filtrado por query params (`?nombre=Juan` usando operadores `Op.like` y `?rol=cliente`), permitiendo búsquedas dinámicas sin inyección de SQL.
-
----
-
-### Lección 3: Modificación Controlada y Validaciones
-- **¿Por qué decidiste actualizar sólo ciertos campos en el `PUT`?**  
-  Por principio de seguridad (*Mass Assignment Protection*). En una API segura no se debe permitir que un usuario modifique arbitrariamente atributos críticos como el `id`, la fecha de creación `createdAt`, o eleve sus privilegios cambiando su propio `rol` a `administrador` sin validación. Por ello, `updateUser` solo permite modificar explícitamente `nombre`, `rol` y `activo`.
-- **¿Qué validaciones aplicaste para evitar errores?**  
-  1. **Validación de existencia previa**: Si el ID no existe en la base de datos, se responde con un código `404 Not Found` en lugar de fallar silenciosamente.
-  2. **Validaciones a nivel de modelo Sequelize**: Validación de formato de email (`isEmail`), no vacíos (`notEmpty`) y valores permitidos para el rol (`isIn: [['cliente', 'administrador', 'invitado']]`).
-
----
-
-### Lección 4: Transaccionalidad y Rollback
-- **Operación atómica**: La función `createUsuarioConPedidoTransaccion` utiliza `sequelize.transaction()`. Se ejecutan dos acciones dependientes: (1) crear el usuario y (2) registrar su pedido de bienvenida.
-- **Rollback garantizado**: Si la segunda operación falla o si se envía el flag `{ "forzarError": true }`, Sequelize ejecuta inmediatamente `t.rollback()`, asegurando que el usuario creado en el paso 1 sea revertido y no queden datos huérfanos.
-- **Evidencia de auditoría**: Las transacciones fallidas se registran automáticamente en el archivo plano `logs/log.txt` con fecha, hora, motivo del error y datos involucrados (cumpliendo la Tarea PLUS de la lección).
-
----
-
-### Lección 5: Comparación ORM vs SQL Tradicional
-- **¿Qué ventajas encontraste usando ORM frente al cliente SQL tradicional?**
-  1. **Seguridad contra Inyección SQL**: El ORM parametriza automáticamente todas las consultas.
-  2. **Mantenibilidad y Productividad**: No requiere concatenar strings de SQL; los modelos representan directamente las entidades del dominio con validaciones integradas.
-  3. **Independencia del Motor de BD**: El mismo código JavaScript funciona sobre SQLite, PostgreSQL, MySQL o MariaDB.
-- Se implementó el endpoint `GET /usuarios/comparacion-sql` que ejecuta la misma consulta mediante `User.findAll()` y `sequelize.query()` midiendo tiempos en milisegundos para verificar paridad de resultados.
+*Si no se envía el token o es inválido:*
+```json
+{
+  "status": "fail",
+  "message": "Acceso no autorizado: No se proporcionó el token de autenticación.",
+  "instrucciones": "Debe incluir la cabecera \"Authorization: Bearer <su_token>\""
+}
+```
 
 ---
 
-### Lección 6: Relaciones 1:N en el ORM
-- Se estableció la relación entre `User` y `Order`:
-  ```javascript
-  User.hasMany(Order, { foreignKey: 'userId', as: 'pedidos', onDelete: 'CASCADE' });
-  Order.belongsTo(User, { foreignKey: 'userId', as: 'usuario' });
+## 🧠 Respuestas a Justificaciones Técnicas (Módulo #8)
+
+### 1. ¿Cómo decidiste separar tus rutas y controladores?
+Se aplicó el principio de **Separación de Responsabilidades (SoC)** del diseño RESTful:
+- Las **Rutas** (`routes/`) se limitan a definir endpoints, verbos HTTP y encadenar middlewares (como `verifyToken` y `upload.single`).
+- Los **Controladores** (`controllers/`) se encargan exclusivamente de la capa de transporte HTTP: desestructuran `req.body`, `req.params` o `req.query`, llaman al servicio correspondiente y devuelven respuestas HTTP consistentes (`status`, `data`, `message`).
+- Los **Servicios** (`services/`) encapsulan la lógica de negocio y las consultas a Sequelize, desacoplando completamente la base de datos de los controladores.
+
+### 2. ¿Qué validaciones realizaste antes de insertar/modificar datos?
+1. **Validaciones en Controladores y Servicios**:
+   - Presencia obligatoria de campos requeridos (`nombre`, `email`, `password`).
+   - Verificación de duplicidad de correo electrónico antes del registro.
+   - En peticiones `PUT`: comprobación previa de existencia del recurso (`findByPk`) retornando `404` si no existe, y filtrado selectivo de campos (*Mass Assignment Protection*) para impedir sobreescritura del `id`.
+2. **Validaciones en Subida de Archivos (`multer`)**:
+   - Filtro de tipo MIME estricto (`image/jpeg`, `image/png`, `image/webp`, `image/gif`).
+   - Límite estricto de tamaño (`2MB`) para evitar sobrecarga del servidor.
+3. **Validaciones a nivel de Modelo ORM**:
+   - `isEmail`, `notEmpty`, y restricciones de enumeración (`isIn: [['cliente', 'administrador', 'invitado']]`).
+
+### 3. ¿Por qué decidiste proteger esas rutas?
+Se protegieron las rutas de mutación de datos (`POST /usuarios`, `PUT /usuarios/:id`, `DELETE /usuarios/:id` y `POST /upload`) aplicando el **Principio de Menor Privilegio**:
+- Las operaciones de lectura (`GET`) pueden ser públicas o accesibles según la necesidad de presentación.
+- Sin embargo, la creación, alteración o eliminación de registros, así como el consumo de almacenamiento en disco del servidor (subida de archivos), son operaciones de alto impacto que solo deben ser ejecutadas por usuarios autenticados con identidad verificada mediante JWT.
+
+### 4. ¿Dónde y cómo almacenas el token?
+- **En el Servidor**: El servidor es *stateless* (sin estado). No almacena el token en memoria ni base de datos, sino que verifica criptográficamente su firma digital usando la clave secreta (`process.env.JWT_SECRET`) y valida su tiempo de expiración (`exp`).
+- **En el Cliente**: El token debe enviarse en cada petición en el encabezado estándar:
+  ```http
+  Authorization: Bearer <token_jwt>
   ```
-- El endpoint `GET /usuarios/:id/pedidos` utiliza el modificador `include: [{ model: Order, as: 'pedidos' }]` para resolver la consulta de ambas entidades en un solo viaje a la base de datos relacional.
+  En aplicaciones web modernas de producción, la recomendación de máxima seguridad es almacenarlo en una cookie con atributos `HttpOnly`, `Secure` y `SameSite=Strict` para prevenir ataques de *Cross-Site Scripting* (XSS). Para propósitos didácticos y consumo desde clientes móviles o SPA desacopladas, se gestiona a través del encabezado `Authorization`.
 
 ---
 
-## 🔮 Proyección al Módulo #8
+## 🔮 Reflexión Integradora de los Tres Módulos
 
-Con la capa de datos consolidada, el sistema queda 100% preparado para el siguiente nivel:
-1. **Autenticación JWT**: Creación de middleware de autenticación (`verifyToken`) para validar el token Bearer en rutas protegidas.
-2. **Subida de Archivos**: Integración de `multer` para permitir a los usuarios subir su foto de perfil a `public/uploads/` con validación de tipo MIME y tamaño máximo.
+El desarrollo de este proyecto demuestra la evolución completa del desarrollo Backend moderno:
+1. **Módulo #6 (Los Cimientos)**: Aprendimos el ciclo de solicitud-respuesta en Express, la configuración de middlewares, la entrega de contenido estático y la persistencia plana con `fs`. Esto sentó las bases de organización modular del proyecto.
+2. **Módulo #7 (Persistencia y Datos Relacionales)**: Dimos el salto a una base de datos real con el ORM Sequelize, entendiendo cómo modelar entidades, establecer relaciones relacionales (1:N), construir operaciones CRUD y garantizar la consistencia mediante transacciones atómicas con rollback.
+3. **Módulo #8 (Seguridad, REST y Cierre Profesional)**: Transformamos la aplicación en una API RESTful profesional, asegurándola con autenticación basada en JSON Web Tokens, encriptando contraseñas con bcryptjs y gestionando la carga segura de archivos con Multer.
